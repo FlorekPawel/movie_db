@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'profile.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+{% endblock %}
+
+{% block title %}
+  Profile - Movie Database
+{% endblock %}
+
+{% block content %}
+  <div class="profile-container">
+    <h1>User Profile</h1>
+    <p>
+      <strong>Username:</strong> {{ user.username }}
+    </p>
+    <p>
+        <strong>Email:</strong> {{user.email}}
+    </p>
+    <p>
+      <strong>Account Created:</strong> {{ user.date_joined|date:'d-m-Y' }}
+    </p>
+  </div>
+
+  <h2>Bookmarked & Rated Movies</h2>
+  {% if bookmarks or ratings %}
+    <table class="profile-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Rating</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rating in ratings %}
+          <tr>
+            <td>
+              <a href="{% url 'movie_info' rating.movie.id %}">{{ rating.movie.title }}</a>
+            </td>
+            <td>
+              <div class="star-rating">
+                {% for i in star_range %}
+                  {% if i < rating.rating %}
+                    <!-- Display filled star -->
+                    <i class="fas fa-star"></i>
+                  {% else %}
+                    <!-- Display empty star -->
+                    <i class="far fa-star"></i>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </td>
+            <td>
+              <button class="bookmark-btn {% if rating.movie.id in bookmarks %}bookmarked{% endif %}" data-movie-id="{{ rating.movie.id }}">
+                {% if rating.movie.id in bookmarks %}
+                  <i class="fas fa-bookmark"></i>
+                {% else %}
+                  <i class="far fa-bookmark"></i>
+                {% endif %}
+              </button>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <td colspan="6">No bookmarked or rated movies available.</td>
+  {% endif %}
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('.bookmark-btn').on('click', function () {
+        const button = $(this)
+        const movieId = button.data('movie-id')
+        const action = button.hasClass('bookmarked') ? 'remove' : 'add'
+    
+        $.ajax({
+          url: '{% url "toggle_bookmark" %}',
+          type: 'POST',
+          data: {
+            movie_id: movieId,
+            action: action,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success: function (response) {
+            if (action === 'add') {
+              button.addClass('bookmarked')
+              button.html('<i class="fas fa-bookmark"></i>')
+            } else {
+              button.removeClass('bookmarked')
+              button.html('<i class="far fa-bookmark"></i>')
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error('Error toggling bookmark:', error)
+          }
+        })
+      })
+    })
+  </script>
+{% endblock %}

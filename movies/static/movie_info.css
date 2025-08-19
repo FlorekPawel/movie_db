@@ -1,0 +1,108 @@
+.movie-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+p strong {
+    color: #333;
+    font-weight: bold;
+}
+
+.user-interact {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.user_star-rating i {
+    color: #333;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.user_star-rating i:hover,
+.user_star-rating i:hover~i {
+    color: #333;
+}
+
+.bookmark-btn {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: #333;
+}
+
+.bookmark-btn:hover {
+    color: #7a7a7a;
+}
+
+.bookmark-btn i {
+    margin-right: 5px;
+    font-size: 20px;
+}
+
+.bookmark-btn.bookmarked i {
+    color: #333;
+}
+
+.rating-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+}
+
+.rating-table thead {
+    background-color: #555;
+    color: #ffffff;
+}
+
+.rating-table th {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.rating-table td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.rating-table tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+.rating-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+@media (max-width: 600px) {
+    .rating-table {
+        font-size: 14px;
+    }
+
+    .rating-table th,
+    .rating-table td {
+        padding: 8px;
+    }
+
+    .user_star-rating i {
+        font-size: 20px;
+    }
+
+    .bookmark-btn i {
+        font-size: 18px;
+    }
+}

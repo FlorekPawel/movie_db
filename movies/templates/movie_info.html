@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'movie_info.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+{% endblock %}
+
+{% block title %}
+  {{ movie.title }} info - Movie Database
+{% endblock %}
+
+{% block content %}
+  <div class="movie-container">
+    <h1>Movie Info</h1>
+    <p>
+      <strong>Title:</strong> {{ movie.title }}
+    </p>
+    <p>
+      <strong>Genre:</strong> {{ movie.genre }}
+    </p>
+    <p>
+      <strong>Duration:</strong> {{ movie.duration }} min
+    </p>
+    <p>
+      <strong>Director:</strong> {{ movie.director }}
+    </p>
+    <p>
+      <strong>Release year:</strong> {{ movie.release_year }}
+    </p>
+    <p>
+      <strong>Average rating:</strong> {{ avg_rating|default:'No ratings yet' }}
+    </p>
+    <p>
+      <strong>Number of bookmarks:</strong><span id="bookmark-count"> &nbsp; {{ bookmarks.count }}</span>
+    </p>
+
+    <h3>Rate this movie:</h3>
+    <div class="user-interact">
+      <div class="user_star-rating" data-movie-id="{{ movie.id }}">
+        {% for i in star_range %}
+          {% if user_rating and i < user_rating.rating %}
+            <i class="fas fa-star" data-rating="{{ i }}"></i>
+          {% else %}
+            <i class="far fa-star" data-rating="{{ i }}"></i>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <button class="bookmark-btn {% if movie in request.user.bookmarks.all %}bookmarked{% endif %}" data-movie-id="{{ movie.id }}">
+        {% if movie in request.user.bookmarks.all %}
+          <i class="fas fa-bookmark"></i>
+        {% else %}
+          <i class="far fa-bookmark"></i>
+        {% endif %}
+      </button>
+    </div>
+  </div>
+
+  <h2>User ratings</h2>
+  <table class="rating-table">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Rating</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rating in ratings %}
+        <tr>
+          <td>{{ rating.user.username }}</td>
+          <td>
+            <div class="star-rating">
+              {% for i in star_range %}
+                <!-- Create a loop from 1 to 5 (inclusive) -->
+                {% if i < rating.rating %}
+                  <!-- Display filled star -->
+                  <i class="fas fa-star"></i>
+                {% else %}
+                  <!-- Display empty star -->
+                  <i class="far fa-star"></i>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="6">No ratings available</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('.user_star-rating i').on('click', function () {
+        const star = $(this)
+        const ratingValue = star.data('rating') + 1
+        const movieId = star.closest('.user_star-rating').data('movie-id')
+    
+        $.ajax({
+          url: '{% url "submit_movie_rating" %}', // Update this with the correct URL
+          type: 'POST',
+          data: {
+            movie_id: movieId,
+            rating: ratingValue,
+            csrfmiddlewaretoken: '{{ csrf_token }}' // Include CSRF token
+          },
+          success: function (response) {
+            if (response.success) {
+              // Update the stars based on the new rating
+              star
+                .closest('.user_star-rating')
+                .find('i')
+                .each(function (index) {
+                  if (index < ratingValue) {
+                    $(this).removeClass('far').addClass('fas')
+                  } else {
+                    $(this).removeClass('fas').addClass('far')
+                  }
+                })
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error('Error submitting rating:', error)
+          }
+        })
+      })
+    })
+  </script>
+  <script>
+    $(document).ready(function () {
+      $('.bookmark-btn').on('click', function () {
+        const button = $(this)
+        const movieId = button.data('movie-id')
+        const action = button.hasClass('bookmarked') ? 'remove' : 'add'
+    
+        $.ajax({
+          url: '{% url "toggle_bookmark" %}',
+          type: 'POST',
+          data: {
+            movie_id: movieId,
+            action: action,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success: function (response) {
+            if (action === 'add') {
+              button.addClass('bookmarked')
+              button.html('<i class="fas fa-bookmark"></i>')
+    
+              const bookmarkCountElement = $('#bookmark-count')
+              let currentCount = parseInt(bookmarkCountElement.text(), 10)
+              bookmarkCountElement.text(currentCount + 1)
+            } else {
+              button.removeClass('bookmarked')
+              button.html('<i class="far fa-bookmark"></i>')
+    
+              const bookmarkCountElement = $('#bookmark-count')
+              let currentCount = parseInt(bookmarkCountElement.text(), 10)
+              bookmarkCountElement.text(currentCount - 1)
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error('Error toggling bookmark:', error)
+          }
+        })
+      })
+    })
+  </script>
+{% endblock %}

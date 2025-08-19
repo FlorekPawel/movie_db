@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Add movie - Movie Database
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'add_movie.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="add-movie-container">
+    <h1 class="text-center">Add a new movie</h1>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="movie-form-group">{{ movie_form.title.label_tag }}
+        {{ movie_form.title }}</div>
+
+      <div class="movie-form-group">{{ movie_form.genre.label_tag }}
+        {{ movie_form.genre }}</div>
+
+      <div class="movie-form-group">{{ movie_form.duration.label_tag }}
+        {{ movie_form.duration }}</div>
+
+      <div class="movie-form-group">{{ movie_form.director.label_tag }}
+        {{ movie_form.director }}</div>
+
+      <div class="movie-form-group">{{ movie_form.release_year.label_tag }}
+        {{ movie_form.release_year }}</div>
+
+      <div class="movie-form-submit">
+        <button type="submit">Add Movie</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

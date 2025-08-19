@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Movies - Movie Database
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'movies.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+{% endblock %}
+
+{% block content %}
+  <h2>Movie Library</h2>
+  <table class="movie-table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Genre</th>
+        <th>Director</th>
+        <th>Release Year</th>
+        <th>Rating</th>
+        <th></th>
+      </tr>
+    </thead>
+    <div class="filter-container">
+      <form method="get" class="filter-form">
+        <div class="form-group">{{ filter.form.title }}</div>
+        <div class="form-group">{{ filter.form.genre }}</div>
+        <div class="form-group">{{ filter.form.director }}</div>
+        <div class="form-group">{{ filter.form.year }}</div>
+        <div class="form-group">{{ filter.form.rating }}</div>
+        <button type="submit" class="filter-button">Search</button>
+      </form>
+    </div>
+    <tbody>
+      {% for movie in page_obj %}
+        <tr>
+          <td>
+            <a href="{% url 'movie_info' movie.id %}">{{ movie.title }}</a>
+          </td>
+          <td>{{ movie.genre }}</td>
+          <td>{{ movie.director }}</td>
+          <td>{{ movie.release_year }}</td>
+          <td>{{ movie.average_rating }}</td>
+          <td>
+            <button class="bookmark-btn {% if movie.id in bookmarks %}bookmarked{% endif %}" data-movie-id="{{ movie.id }}">
+              {% if movie.id in bookmarks %}
+                <i class="fas fa-bookmark"></i>
+              {% else %}
+                <i class="far fa-bookmark"></i>
+              {% endif %}
+            </button>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="6">No movies available.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    <span class="step-links">
+      {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; first</a>
+        <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+      {% endif %}
+      <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+      {% endif %}
+    </span>
+  </div>
+
+  <div class="add-movie-container">
+    <a class="add-movie" href="{% url 'add_movie' %}">Add movie</a>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('.bookmark-btn').on('click', function () {
+        const button = $(this)
+        const movieId = button.data('movie-id')
+        const action = button.hasClass('bookmarked') ? 'remove' : 'add'
+    
+        $.ajax({
+          url: '{% url "toggle_bookmark" %}',
+          type: 'POST',
+          data: {
+            movie_id: movieId,
+            action: action,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success: function (response) {
+            if (action === 'add') {
+              button.addClass('bookmarked')
+              button.html('<i class="fas fa-bookmark"></i>')
+            } else {
+              button.removeClass('bookmarked')
+              button.html('<i class="far fa-bookmark"></i>')
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error('Error toggling bookmark:', error)
+          }
+        })
+      })
+    })
+  </script>
+{% endblock %}

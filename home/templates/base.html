@@ -1,0 +1,54 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{% static 'base.css' %}" />
+    {% block extra_css %}
+
+    {% endblock %}
+    <title>
+      {% block title %}
+        Movie Database
+      {% endblock %}
+    </title>
+  </head>
+
+  <body>
+    <div class="navbar">
+      <div class="site-name">Movie Database</div>
+      <div class="nav-buttons">
+        <a href="{% url 'home' %}">Home</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'movies' %}">Movies</a>
+          <a href="{% url 'profile' %}">Profile</a>
+          <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+          <a href="{% url 'login' %}">Login</a>
+          <a href="{% url 'register' %}">Sign up</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="container">
+      {% if messages %}
+        <div class="alerts-container">
+          {% for message in messages %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="this.parentElement.style.display='none';"><span aria-hidden="true">&times;</span></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% block content %}
+
+      {% endblock %}
+    </div>
+    <footer>
+      <p>&copy; 2024 Movie Database.</p>
+    </footer>
+  </body>
+</html>

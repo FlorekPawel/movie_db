@@ -1,0 +1,82 @@
+.add-movie-container {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 30px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+.movie-form-group {
+    margin-bottom: 20px;
+}
+
+.movie-form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.movie-form-group input,
+.movie-form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #fff;
+    font-family: 'Arial', sans-serif;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.movie-form-group input:focus,
+.movie-form-group select:focus {
+    border-color: #555;
+    outline: none;
+}
+
+.add-movie-container button {
+    background-color: #333;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.add-movie-container button:hover {
+    background-color: #575757;
+}
+
+.movie-form-submit {
+    display: flex;
+    justify-content: flex-end;
+}
+
+@media (max-width: 600px) {
+    .movie-container {
+        padding: 20px;
+    }
+
+    .movie-form-group input,
+    .movie-form-group select {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .btn-primary {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+}
